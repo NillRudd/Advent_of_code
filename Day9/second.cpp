@@ -17,12 +17,14 @@ int main(){
     //s = "12345";
     s = "2333133121414131402";
 
-    size_t countinput = 0; 
+
+
+size_t countinput = 0; 
     int inti = 0;
     long result = 0;
     std::vector<int> data;
 
-    // Fill `data` vector based on `s` (your existing logic)
+    // Fill the data array
     while (!s.empty()) {
         int val = s[0] - '0';
         s.erase(s.begin());
@@ -34,42 +36,58 @@ int main(){
             inti++;
         } else {
             for (int i = 0; i < val; i++) {
-                data.push_back(-1);
+                data.push_back(-1); // -1 represents '.'
             }
         }
         countinput++;
     }
 
-    // Move blocks logic
-    if (!data.empty()) {  // Ensure `data` is not empty
-        for (size_t i = data.size(); i-- > 0;) {  // Safely iterate from end to start
-            if (data[i] != -1) {
-                // Identify the block's range (rightmost contiguous block)
-                size_t end = i;
-                size_t start = i;
-                while (start > 0 && data[start - 1] == data[i]) {
-                    --start;
-                }
+    // Print initial state of data
+    std::cout << "Initial Data:\n";
+    for (int d : data) {
+        if (d == -1) std::cout << ".";
+        else std::cout << d;
+    }
+    std::cout << "\n";
 
-                // Find the first open position from the left
-                size_t openPos = 0;
-                while (openPos < data.size() && data[openPos] != -1) {
-                    ++openPos;
-                }
-
-                // If there's space to move the block, shift it
-                if (openPos + (end - start) < data.size()) {
-                    for (size_t j = 0; j <= (end - start); ++j) {
-                        data[openPos + j] = data[start + j];
-                        data[start + j] = -1;
-                    }
-                }
-
-                // Update `i` to skip the moved block
-                i = start;
+    // Block shifting logic
+    for (size_t i = data.size() - 1; i < data.size(); --i) {
+        if (data[i] != -1) {
+            // Identify the block's range (rightmost contiguous block)
+            size_t end = i;
+            size_t start = i;
+            while (start > 0 && data[start - 1] == data[i]) {
+                --start;
             }
+
+            // Find the nearest gap that can fit the block
+            size_t gapEnd = start - 1;
+            while (gapEnd > 0 && data[gapEnd] == -1) {
+                --gapEnd;
+            }
+            size_t gapStart = gapEnd + 1;
+
+            // Check if the gap is large enough for the block
+            if (gapStart <= start && (start - gapStart) >= (end - start + 1)) {
+                // Move block into the gap
+                for (size_t j = 0; j <= (end - start); ++j) {
+                    data[gapStart + j] = data[start + j];
+                    data[start + j] = -1;
+                }
+            }
+
+            // Update `i` to skip the moved block
+            i = start;
         }
     }
+
+    // Print the final state of data after shifting
+    std::cout << "Final Data:\n";
+    for (int d : data) {
+        if (d == -1) std::cout << ".";
+        else std::cout << d;
+    }
+    std::cout << "\n";
 
     // Count logic
     countinput = 0;
